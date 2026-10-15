@@ -7,8 +7,8 @@ import {
 } from "lucide-react";
 import { FaLinkedin } from "react-icons/fa";
 
-// @ts-ignore - html2pdf.js lacks strict TS definitions
-import html2pdf from "html2pdf.js";
+// ❌ REMOVED: Top-level import crashes Next.js SSR/Prerendering because it accesses `self`/`window`
+// import html2pdf from "html2pdf.js";
 
 interface CertificateCardProps {
   certificateId: string;
@@ -51,6 +51,10 @@ export default function CertificateCard({
       const element = certRef.current;
       if (!element) throw new Error("Certificate template not found");
 
+      // ✅ FIX: Dynamically import html2pdf.js ONLY on the client when clicked
+      const html2pdfModule = await import("html2pdf.js");
+      const html2pdf = html2pdfModule.default;
+
       const opt = {
         margin: 0,
         filename: `${courseName.replace(/[^a-zA-Z0-9]/g, "_")}_Certificate.pdf`,
@@ -64,7 +68,8 @@ export default function CertificateCard({
         jsPDF: { unit: "mm", format: "a4", orientation: "landscape" },
       };
 
-      await html2pdf().set(opt).from(element).save();
+      // ✅ Cast opt to `any` to bypass strict html2pdf.js literal type checking
+      await html2pdf().set(opt as any).from(element).save();
     } catch (err) {
       console.error("PDF generation error:", err);
       alert("Failed to generate PDF. Please try again.");

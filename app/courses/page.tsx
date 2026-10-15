@@ -9,8 +9,6 @@ import Loader from "@/components/Loader";
 import type { Course } from "@/types/course";
 import { BookOpen, Sparkles, X } from "lucide-react";
 
-// ❌ Removed the hardcoded CATEGORIES array to prevent mismatches
-
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -124,7 +122,10 @@ export default function CoursesPage() {
       {/* ========================================== */}
       <section className="mx-auto max-w-7xl px-6 pt-12">
         <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center lg:text-left">Explore Categories</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
+        
+        {/* ✅ UPDATED: Changed lg:grid-cols-7 to lg:grid-cols-5 to perfectly fit 10 items (1 All + 9 Categories) */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          
           {/* All Courses Button */}
           <button
             onClick={() => setActiveCategory("All")}

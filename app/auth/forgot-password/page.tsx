@@ -1,4 +1,3 @@
-// app/auth/forgot-password/page.tsx
 "use client";
 
 import { useState, FormEvent } from "react";
@@ -22,25 +21,29 @@ export default function ForgotPasswordPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState("");
 
-  // 1. Handle Password Reset Request
+  // Handle Password Reset Request
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
+    // ✅ Guard: Ensure Firebase auth is initialized
+    if (!auth) {
+      setError("Authentication service is unavailable. Please try again later.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      // Attempt to send the reset email
       await sendPasswordResetEmail(auth, email);
       
       // SECURITY BEST PRACTICE: 
-      // We set success to true regardless of whether the email exists in Firebase.
-      // This prevents "Email Enumeration" attacks (hackers checking if an email is registered).
+      // Set success to true regardless of whether the email exists in Firebase.
+      // This prevents "Email Enumeration" attacks.
       setIsSuccess(true);
     } catch (err: any) {
       console.error("Password reset error:", err);
       
-      // If it's a completely invalid email format, show an error.
-      // Otherwise, for security, we still show the success screen.
       if (err.code === "auth/invalid-email") {
         setError("Please enter a valid email address.");
         setIsLoading(false);
@@ -159,9 +162,9 @@ export default function ForgotPasswordPage() {
               </Link>
             </div>
           ) : (
-            /* ========================================== */}
-            {/* STATE 2: EMAIL INPUT FORM */}
-            {/* ========================================== */}
+            /* ========================================== */
+            /* STATE 2: EMAIL INPUT FORM */
+            /* ========================================== */
             <>
               {/* Mobile Logo */}
               <Link href="/" className="flex items-center gap-3 mb-8 lg:hidden">
